@@ -10,4 +10,4 @@ Service for OpenStack.
 * Free software: Apache license
 * Documentation: http://docs.openstack.org/magnum/latest
 * Source: http://git.openstack.org/cgit/openstack/magnum-tempest-plugin
-* Bugs: http://bugs.launchpad.net/magnum
+* Bugs: https://storyboard.openstack.org/#!/project/openstack/magnum-tempest-plugin
