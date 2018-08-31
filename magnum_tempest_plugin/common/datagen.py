@@ -505,6 +505,7 @@ def valid_cluster_template(is_public=False):
         http_proxy=None, https_proxy=None,
         no_proxy=None, network_driver=config.Config.network_driver,
         volume_driver=None, labels={},
+        docker_storage_driver=config.Config.docker_storage_driver,
         tls_disabled=False)
 
 

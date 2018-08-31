@@ -79,6 +79,10 @@ class Config(object):
             cls.admin_role = 'admin'
 
     @classmethod
+    def set_docker_storage_driver(cls, config):
+        cls.docker_storage_driver = CONF.magnum.get('docker_storage_driver')
+
+    @classmethod
     def set_region(cls, config):
         if 'region' in CONF.identity:
             cls.region = CONF.identity.region
@@ -153,6 +157,7 @@ class Config(object):
         cls.set_auth_url(config)
         cls.set_admin_role(config)
 
+        cls.set_docker_storage_driver(config)
         cls.set_region(config)
         cls.set_image_id(config)
         cls.set_nic_id(config)

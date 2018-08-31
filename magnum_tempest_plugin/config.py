@@ -28,6 +28,9 @@ ServiceAvailableGroup = [
 magnum_group = cfg.OptGroup(name="magnum", title="Magnum Options")
 
 MagnumGroup = [
+    cfg.StrOpt("docker_storage_driver",
+               help="Docker storage driver. Supported: devicemapper, overlay"),
+
     cfg.StrOpt("image_id",
                default="fedora-atomic-latest",
                help="Image id to be used for ClusterTemplate."),
