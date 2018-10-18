@@ -118,7 +118,7 @@ class ClusterClient(client.MagnumClient):
     def wait_for_created_cluster(self, cluster_id, delete_on_error=True):
         try:
             utils.wait_for_condition(
-                lambda: self.does_cluster_exist(cluster_id), 10, 1800)
+                lambda: self.does_cluster_exist(cluster_id), 10, 3600)
         except Exception:
             # In error state.  Clean up the cluster id if desired
             self.LOG.error('Cluster %s entered an exception state.',
@@ -131,7 +131,7 @@ class ClusterClient(client.MagnumClient):
 
     def wait_for_final_state(self, cluster_id):
         utils.wait_for_condition(
-            lambda: self.is_cluster_in_final_state(cluster_id), 10, 1800)
+            lambda: self.is_cluster_in_final_state(cluster_id), 10, 3600)
 
     def is_cluster_in_final_state(self, cluster_id):
         try:
@@ -156,7 +156,7 @@ class ClusterClient(client.MagnumClient):
                 self.LOG.error('Cluster %s is in fail state.',
                                cluster_id)
                 raise exceptions.ServerFault(
-                    "Got into an error condition: %s for %s",
+                    "Got into an error condition: %s for %s" %
                     (model.status, cluster_id))
             else:
                 return False
