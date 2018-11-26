@@ -68,7 +68,7 @@ class ClusterTest(base.BaseTempestTest):
 
             # NOTE (dimtruck) by default tempest sets timeout to 20 mins.
             # We need more time.
-            test_timeout = 1800
+            test_timeout = 3600
             self.useFixture(fixtures.Timeout(test_timeout, gentle=True))
         except Exception:
             self.tearDown()
@@ -133,6 +133,7 @@ class ClusterTest(base.BaseTempestTest):
     # (dimtruck) Combining all these tests in one because
     # they time out on the gate (2 hours not enough)
     @testtools.testcase.attr('positive')
+    @testtools.testcase.attr('slow')
     def test_create_list_sign_delete_clusters(self):
         gen_model = datagen.valid_cluster_data(
             cluster_template_id=self.cluster_template.uuid, node_count=1)
