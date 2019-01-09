@@ -138,6 +138,14 @@ class Config(object):
         cls.copy_logs = str(CONF.magnum.copy_logs).lower() == 'true'
 
     @classmethod
+    def set_coe(cls, config):
+        cls.coe = CONF.magnum.coe
+
+    @classmethod
+    def set_network_driver(cls, config):
+        cls.network_driver = CONF.magnum.network_driver
+
+    @classmethod
     def setUp(cls):
         cls.set_admin_creds(config)
         cls.set_user_creds(config)
@@ -155,3 +163,5 @@ class Config(object):
         cls.set_csr_location(config)
         cls.set_dns_nameserver(config)
         cls.set_copy_logs(config)
+        cls.set_coe(config)
+        cls.set_network_driver(config)

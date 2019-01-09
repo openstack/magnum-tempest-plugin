@@ -64,4 +64,11 @@ MagnumGroup = [
     cfg.BoolOpt("copy_logs",
                 default=True,
                 help="Specify whether to copy nova server logs on failure."),
+
+    cfg.StrOpt("coe",
+               default="swarm-mode",
+               help="Container Orchestration Engine"),
+
+    cfg.StrOpt("network_driver",
+               help="Network Driver"),
 ]
