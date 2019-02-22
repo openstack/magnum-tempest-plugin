@@ -14,21 +14,32 @@ import logging
 import os
 import subprocess
 
-from tempest.lib import base
+from tempest import config
+from tempest import test
 
 import magnum_tempest_plugin
 
 
+CONF = config.CONF
 COPY_LOG_HELPER = "magnum_tempest_plugin/tests/contrib/copy_instance_logs.sh"
 
 
-class BaseMagnumTest(base.BaseTestCase):
+class BaseMagnumTest(test.BaseTestCase):
     """Sets up configuration required for functional tests"""
 
     LOG = logging.getLogger(__name__)
 
     def __init__(self, *args, **kwargs):
         super(BaseMagnumTest, self).__init__(*args, **kwargs)
+
+    @classmethod
+    def skip_checks(cls):
+        super(BaseMagnumTest, cls).skip_checks()
+
+        if not CONF.service_available.magnum:
+            skip_msg = ("%s skipped as magnum is not available"
+                        % cls.__name__)
+            raise cls.skipException(skip_msg)
 
     @classmethod
     def copy_logs_handler(cls, get_nodes_fn, coe, keypair):
