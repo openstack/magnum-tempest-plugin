@@ -30,48 +30,44 @@ magnum_group = cfg.OptGroup(name="magnum", title="Magnum Options")
 MagnumGroup = [
     cfg.StrOpt("docker_storage_driver",
                help="Docker storage driver. Supported: devicemapper, overlay"),
-
     cfg.StrOpt("image_id",
                default="fedora-atomic-latest",
                help="Image id to be used for ClusterTemplate."),
-
     cfg.StrOpt("nic_id",
                default="public",
                help="NIC id."),
-
-    cfg.StrOpt("keypair_id",
-               default="default",
-               help="Keypair id to use to log into nova instances."),
-
+    cfg.StrOpt("keypair_name",
+               default="magnum-test",
+               help="Keypair name to use to log into nova instances, the "
+                    "keypair is created automatically if not exist."),
     cfg.StrOpt("flavor_id",
                default="s1.magnum",
                help="Flavor id to use for ClusterTemplate."),
-
     cfg.StrOpt("magnum_url",
                help="Bypass URL for Magnum to skip service catalog lookup"),
-
     cfg.StrOpt("master_flavor_id",
                default="m1.magnum",
                help="Master flavor id to use for ClusterTemplate."),
-
     cfg.StrOpt("csr_location",
                default="/opt/stack/new/magnum/default.csr",
                deprecated_for_removal=True,
                help="CSR location for certificates. This option is no "
                "longer used for anything."),
-
     cfg.StrOpt("dns_nameserver",
                default="8.8.8.8",
                help="DNS nameserver to use for ClusterTemplate."),
-
     cfg.BoolOpt("copy_logs",
                 default=True,
                 help="Specify whether to copy nova server logs on failure."),
-
     cfg.StrOpt("coe",
                default="swarm-mode",
                help="Container Orchestration Engine"),
-
     cfg.StrOpt("network_driver",
                help="Network Driver"),
+    cfg.StrOpt("cluster_template_id",
+               help="UUID of cluster template used for the test."),
+    cfg.IntOpt("cluster_creation_timeout",
+               default=30,
+               help="Timeout(in minutes) to wait for the cluster creation "
+                    "finished."),
 ]

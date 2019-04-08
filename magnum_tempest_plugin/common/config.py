@@ -102,10 +102,10 @@ class Config(object):
         cls.nic_id = CONF.magnum.nic_id
 
     @classmethod
-    def set_keypair_id(cls, config):
-        if 'keypair_id' not in CONF.magnum:
-            raise Exception('config missing keypair_id key')
-        cls.keypair_id = CONF.magnum.keypair_id
+    def set_keypair_name(cls, config):
+        if 'keypair_name' not in CONF.magnum:
+            raise Exception('config missing keypair_name key')
+        cls.keypair_name = CONF.magnum.keypair_name
 
     @classmethod
     def set_flavor_id(cls, config):
@@ -150,6 +150,14 @@ class Config(object):
         cls.network_driver = CONF.magnum.network_driver
 
     @classmethod
+    def set_cluster_template_id(cls, config):
+        cls.cluster_template_id = CONF.magnum.cluster_template_id
+
+    @classmethod
+    def set_cluster_creation_timeout(cls, config):
+        cls.cluster_creation_timeout = CONF.magnum.cluster_creation_timeout
+
+    @classmethod
     def setUp(cls):
         cls.set_admin_creds(config)
         cls.set_user_creds(config)
@@ -161,7 +169,7 @@ class Config(object):
         cls.set_region(config)
         cls.set_image_id(config)
         cls.set_nic_id(config)
-        cls.set_keypair_id(config)
+        cls.set_keypair_name(config)
         cls.set_flavor_id(config)
         cls.set_magnum_url(config)
         cls.set_master_flavor_id(config)
@@ -170,3 +178,5 @@ class Config(object):
         cls.set_copy_logs(config)
         cls.set_coe(config)
         cls.set_network_driver(config)
+        cls.set_cluster_template_id(config)
+        cls.set_cluster_creation_timeout(config)

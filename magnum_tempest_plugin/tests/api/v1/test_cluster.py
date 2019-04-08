@@ -33,46 +33,64 @@ class ClusterTest(base.BaseTempestTest):
     """Tests for cluster CRUD."""
 
     LOG = logging.getLogger(__name__)
+    delete_template = False
 
     def __init__(self, *args, **kwargs):
         super(ClusterTest, self).__init__(*args, **kwargs)
         self.clusters = []
-        self.creds = None
-        self.keypair = None
-        self.cluster_template = None
-        self.cluster_template_client = None
-        self.keypairs_client = None
-        self.cluster_client = None
-        self.cert_client = None
+
+    @classmethod
+    def setUpClass(cls):
+        super(ClusterTest, cls).setUpClass()
+
+        try:
+            (cls.creds, cls.keypair) = cls.get_credentials_with_keypair(
+                type_of_creds='default'
+            )
+            (cls.cluster_template_client,
+             cls.keypairs_client) = cls.get_clients_with_existing_creds(
+                creds=cls.creds,
+                type_of_creds='default',
+                request_type='cluster_template'
+            )
+            (cls.cluster_client, _) = cls.get_clients_with_existing_creds(
+                creds=cls.creds,
+                type_of_creds='default',
+                request_type='cluster'
+            )
+            (cls.cert_client, _) = cls.get_clients_with_existing_creds(
+                creds=cls.creds,
+                type_of_creds='default',
+                request_type='cert'
+            )
+
+            if config.Config.cluster_template_id:
+                _, cls.cluster_template = cls.cluster_template_client.\
+                    get_cluster_template(config.Config.cluster_template_id)
+            else:
+                model = datagen.valid_cluster_template()
+                _, cls.cluster_template = cls._create_cluster_template(model)
+                cls.delete_template = True
+        except Exception:
+            raise
+
+    @classmethod
+    def tearDownClass(cls):
+        if cls.delete_template:
+            cls._delete_cluster_template(cls.cluster_template.uuid)
+
+        if config.Config.keypair_name:
+            cls.keypairs_client.delete_keypair(config.Config.keypair_name)
+
+        super(ClusterTest, cls).tearDownClass()
 
     def setUp(self):
-        try:
-            super(ClusterTest, self).setUp()
-            (self.creds, self.keypair) = self.get_credentials_with_keypair(
-                type_of_creds='default')
-            (self.cluster_template_client,
-                self.keypairs_client) = self.get_clients_with_existing_creds(
-                    creds=self.creds,
-                    type_of_creds='default',
-                    request_type='cluster_template')
-            (self.cluster_client, _) = self.get_clients_with_existing_creds(
-                creds=self.creds,
-                type_of_creds='default',
-                request_type='cluster')
-            (self.cert_client, _) = self.get_clients_with_existing_creds(
-                creds=self.creds,
-                type_of_creds='default',
-                request_type='cert')
-            model = datagen.valid_cluster_template()
-            _, self.cluster_template = self._create_cluster_template(model)
+        super(ClusterTest, self).setUp()
 
-            # NOTE (dimtruck) by default tempest sets timeout to 20 mins.
-            # We need more time.
-            test_timeout = 3600
-            self.useFixture(fixtures.Timeout(test_timeout, gentle=True))
-        except Exception:
-            self.tearDown()
-            raise
+        # NOTE (dimtruck) by default tempest sets timeout to 20 mins.
+        # We need more time.
+        test_timeout = 3600
+        self.useFixture(fixtures.Timeout(test_timeout, gentle=True))
 
     def tearDown(self):
         try:
@@ -80,20 +98,20 @@ class ClusterTest(base.BaseTempestTest):
             for cluster_id in cluster_list:
                 self._delete_cluster(cluster_id)
                 self.clusters.remove(cluster_id)
-            if self.cluster_template:
-                self._delete_cluster_template(self.cluster_template.uuid)
         finally:
             super(ClusterTest, self).tearDown()
 
-    def _create_cluster_template(self, cm_model):
-        self.LOG.debug('We will create a clustertemplate for %s', cm_model)
-        resp, model = self.cluster_template_client.post_cluster_template(
+    @classmethod
+    def _create_cluster_template(cls, cm_model):
+        cls.LOG.debug('We will create a clustertemplate for %s', cm_model)
+        resp, model = cls.cluster_template_client.post_cluster_template(
             cm_model)
         return resp, model
 
-    def _delete_cluster_template(self, cm_id):
-        self.LOG.debug('We will delete a clustertemplate for %s', cm_id)
-        resp, model = self.cluster_template_client.delete_cluster_template(
+    @classmethod
+    def _delete_cluster_template(cls, cm_id):
+        cls.LOG.debug('We will delete a clustertemplate for %s', cm_id)
+        resp, model = cls.cluster_template_client.delete_cluster_template(
             cm_id)
         return resp, model
 
@@ -113,15 +131,20 @@ class ClusterTest(base.BaseTempestTest):
                      self._get_cluster_by_id(model.uuid)[1].node_addresses]),
                 self.cluster_template.coe,
                 self.keypair))
+
+        timeout = config.Config.cluster_creation_timeout * 60
         self.cluster_client.wait_for_created_cluster(model.uuid,
-                                                     delete_on_error=False)
+                                                     delete_on_error=False,
+                                                     timeout=timeout)
         return resp, model
 
     def _delete_cluster(self, cluster_id):
         self.LOG.debug('We will delete a cluster for %s', cluster_id)
         resp, model = self.cluster_client.delete_cluster(cluster_id)
         self.assertEqual(204, resp.status)
+
         self.cluster_client.wait_for_cluster_to_delete(cluster_id)
+
         self.assertRaises(exceptions.NotFound, self.cert_client.get_cert,
                           cluster_id, headers=HEADERS)
         return resp, model
@@ -150,13 +173,6 @@ class ClusterTest(base.BaseTempestTest):
             cluster_model.uuid, list([x['uuid']
                                       for x in cluster_list_model.clusters]))
 
-        # test invalid cluster update
-        patch_model = datagen.cluster_name_patch_data()
-        self.assertRaises(
-            exceptions.BadRequest,
-            self.cluster_client.patch_cluster,
-            cluster_model.uuid, patch_model)
-
         # test ca show
         resp, cert_model = self.cert_client.get_cert(
             cluster_model.uuid, headers=HEADERS)
@@ -168,7 +184,6 @@ class ClusterTest(base.BaseTempestTest):
         self.assertIn('-----END CERTIFICATE-----', cert_model.pem)
 
         # test ca sign
-
         csr_sample = """-----BEGIN CERTIFICATE REQUEST-----
 MIIByjCCATMCAQAwgYkxCzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlh
 MRYwFAYDVQQHEw1Nb3VudGFpbiBWaWV3MRMwEQYDVQQKEwpHb29nbGUgSW5jMR8w
@@ -193,14 +208,6 @@ Q0uA0aVog3f5iJxCa3Hp5gxbJQ6zV6kJ0TEsuaaOhEko9sdpCoPOnRBm2i/XRD2D
         self.assertIsNotNone(cert_model.pem)
         self.assertIn('-----BEGIN CERTIFICATE-----', cert_model.pem)
         self.assertIn('-----END CERTIFICATE-----', cert_model.pem)
-
-        # test ca sign invalid
-        cert_data_model = datagen.cert_data(cluster_model.uuid,
-                                            csr_data="invalid_csr")
-        self.assertRaises(
-            exceptions.BadRequest,
-            self.cert_client.post_cert,
-            cert_data_model, headers=HEADERS)
 
         # test cluster delete
         self._delete_cluster(cluster_model.uuid)

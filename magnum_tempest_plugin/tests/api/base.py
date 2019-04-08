@@ -97,17 +97,23 @@ class BaseTempestTest(base.BaseMagnumTest):
         else:
             creds = ic.self.get_credentials(type_of_creds)
 
-        _, keypairs_client = cls.get_clients(
-            creds, type_of_creds, 'keypair_setup')
-
         keypair = None
-        try:
-            keypairs_client.show_keypair(config.Config.keypair_id)
-        except Exception:
-            keypair_body = keypairs_client.create_keypair(
-                name=config.Config.keypair_id)
-            cls.LOG.debug("Keypair body: %s", keypair_body)
-            keypair = keypair_body['keypair']['private_key']
+
+        if config.Config.keypair_name:
+            _, keypairs_client = cls.get_clients(creds, type_of_creds,
+                                                 'keypair_setup')
+            try:
+                keypairs_client.delete_keypair(config.Config.keypair_name)
+            except Exception:
+                cls.LOG.debug("Creating keypair %s",
+                              config.Config.keypair_name)
+                keypair_body = keypairs_client.create_keypair(
+                    name=config.Config.keypair_name
+                )
+
+                cls.LOG.debug("Keypair body: %s", keypair_body)
+                keypair = keypair_body['keypair']['private_key']
+
         return (creds, keypair)
 
     @classmethod

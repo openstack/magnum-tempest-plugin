@@ -113,18 +113,19 @@ class ClusterClient(client.MagnumClient):
 
     def wait_for_cluster_to_delete(self, cluster_id):
         utils.wait_for_condition(
-            lambda: self.does_cluster_not_exist(cluster_id), 10, 600)
+            lambda: self.does_cluster_not_exist(cluster_id), 10, 300)
 
-    def wait_for_created_cluster(self, cluster_id, delete_on_error=True):
+    def wait_for_created_cluster(self, cluster_id, delete_on_error=True,
+                                 timeout=3600):
         try:
             utils.wait_for_condition(
-                lambda: self.does_cluster_exist(cluster_id), 10, 3600)
+                lambda: self.does_cluster_exist(cluster_id), 10, timeout)
         except Exception:
             # In error state.  Clean up the cluster id if desired
             self.LOG.error('Cluster %s entered an exception state.',
                            cluster_id)
             if delete_on_error:
-                self.LOG.error('We will attempt to delete clusters now.')
+                self.LOG.warning('We will attempt to delete clusters now.')
                 self.delete_cluster(cluster_id)
                 self.wait_for_cluster_to_delete(cluster_id)
             raise

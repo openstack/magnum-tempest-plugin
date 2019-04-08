@@ -161,7 +161,7 @@ def baymodel_data_with_valid_keypair_image_flavor():
     :returns: BayModelEntity with generated data
     """
 
-    return baymodel_data(keypair_id=config.Config.keypair_id,
+    return baymodel_data(keypair_id=config.Config.keypair_name,
                          image_id=config.Config.image_id,
                          flavor_id=config.Config.flavor_id,
                          master_flavor_id=config.Config.master_flavor_id)
@@ -173,7 +173,7 @@ def baymodel_data_with_missing_image():
     :returns: BayModelEntity with generated data
     """
 
-    return baymodel_data(keypair_id=config.Config.keypair_id,
+    return baymodel_data(keypair_id=config.Config.keypair_name,
                          flavor_id=config.Config.flavor_id,
                          master_flavor_id=config.Config.master_flavor_id)
 
@@ -184,7 +184,7 @@ def baymodel_data_with_missing_flavor():
     :returns: BayModelEntity with generated data
     """
 
-    return baymodel_data(keypair_id=config.Config.keypair_id,
+    return baymodel_data(keypair_id=config.Config.keypair_name,
                          image_id=config.Config.image_id)
 
 
@@ -206,7 +206,7 @@ def baymodel_valid_data_with_specific_coe(coe):
     :returns: BayModelEntity with generated data
     """
 
-    return baymodel_data(keypair_id=config.Config.keypair_id,
+    return baymodel_data(keypair_id=config.Config.keypair_name,
                          image_id=config.Config.image_id, coe=coe)
 
 
@@ -220,7 +220,8 @@ def valid_swarm_mode_baymodel(is_public=False):
                          flavor_id=config.Config.flavor_id, public=is_public,
                          dns_nameserver=config.Config.dns_nameserver,
                          master_flavor_id=config.Config.master_flavor_id,
-                         keypair_id=config.Config.keypair_id, coe="swarm-mode",
+                         keypair_id=config.Config.keypair_name,
+                         coe="swarm-mode",
                          cluster_distro=None,
                          external_network_id=config.Config.nic_id,
                          http_proxy=None, https_proxy=None, no_proxy=None,
@@ -436,7 +437,7 @@ def cluster_template_data_with_valid_keypair_image_flavor():
     :returns: ClusterTemplateEntity with generated data
     """
     master_flavor = config.Config.master_flavor_id
-    return cluster_template_data(keypair_id=config.Config.keypair_id,
+    return cluster_template_data(keypair_id=config.Config.keypair_name,
                                  image_id=config.Config.image_id,
                                  flavor_id=config.Config.flavor_id,
                                  master_flavor_id=master_flavor)
@@ -449,7 +450,7 @@ def cluster_template_data_with_missing_image():
     """
 
     return cluster_template_data(
-        keypair_id=config.Config.keypair_id,
+        keypair_id=config.Config.keypair_name,
         flavor_id=config.Config.flavor_id,
         master_flavor_id=config.Config.master_flavor_id)
 
@@ -460,7 +461,7 @@ def cluster_template_data_with_missing_flavor():
     :returns: ClusterTemplateEntity with generated data
     """
 
-    return cluster_template_data(keypair_id=config.Config.keypair_id,
+    return cluster_template_data(keypair_id=config.Config.keypair_name,
                                  image_id=config.Config.image_id)
 
 
@@ -483,7 +484,7 @@ def cluster_template_valid_data_with_specific_coe(coe):
     :returns: ClusterTemplateEntity with generated data
     """
 
-    return cluster_template_data(keypair_id=config.Config.keypair_id,
+    return cluster_template_data(keypair_id=config.Config.keypair_name,
                                  image_id=config.Config.image_id, coe=coe)
 
 
@@ -512,7 +513,7 @@ def valid_cluster_template(is_public=False):
 def cluster_data(name=data_utils.rand_name('cluster'),
                  cluster_template_id=data_utils.rand_uuid(),
                  node_count=random_int(1, 5), discovery_url=gen_random_ip(),
-                 create_timeout=random_int(1, 30),
+                 create_timeout=None,
                  master_count=random_int(1, 5)):
     """Generates random cluster data
 
@@ -529,13 +530,15 @@ def cluster_data(name=data_utils.rand_name('cluster'),
     :returns: ClusterEntity with generated data
     """
 
+    timeout = create_timeout or config.Config.cluster_creation_timeout
+
     data = {
         "name": name,
         "cluster_template_id": cluster_template_id,
-        "keypair": config.Config.keypair_id,
+        "keypair": config.Config.keypair_name,
         "node_count": node_count,
         "discovery_url": None,
-        "create_timeout": create_timeout,
+        "create_timeout": timeout,
         "master_count": master_count
     }
     model = cluster_model.ClusterEntity.from_dict(data)
