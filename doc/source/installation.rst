@@ -8,6 +8,6 @@ the same environment where Tempest is installed.
 
 At the command line::
 
-    $ git clone https://git.openstack.org/cgit/openstack/magnum-tempest-plugin
+    $ git clone https://opendev.org/openstack/magnum-tempest-plugin
     $ cd magnum-tempest-plugin/
     $ pip install -e .
