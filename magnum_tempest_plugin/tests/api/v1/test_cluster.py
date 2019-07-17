@@ -15,6 +15,7 @@ import fixtures
 from oslo_log import log as logging
 from oslo_utils import uuidutils
 from tempest.lib.common.utils import data_utils
+from tempest.lib import decorators
 from tempest.lib import exceptions
 import testtools
 
@@ -157,6 +158,7 @@ class ClusterTest(base.BaseTempestTest):
     # they time out on the gate (2 hours not enough)
     @testtools.testcase.attr('positive')
     @testtools.testcase.attr('slow')
+    @decorators.idempotent_id('44158a8c-a856-11e9-9382-00224d6b7bc1')
     def test_create_list_sign_delete_clusters(self):
         gen_model = datagen.valid_cluster_data(
             cluster_template_id=self.cluster_template.uuid, node_count=1)
@@ -214,6 +216,7 @@ Q0uA0aVog3f5iJxCa3Hp5gxbJQ6zV6kJ0TEsuaaOhEko9sdpCoPOnRBm2i/XRD2D
         self.clusters.remove(cluster_model.uuid)
 
     @testtools.testcase.attr('negative')
+    @decorators.idempotent_id('11c293da-a857-11e9-9382-00224d6b7bc1')
     def test_create_cluster_for_nonexisting_cluster_template(self):
         cm_id = 'this-does-not-exist'
         gen_model = datagen.valid_cluster_data(cluster_template_id=cm_id)
@@ -222,6 +225,7 @@ Q0uA0aVog3f5iJxCa3Hp5gxbJQ6zV6kJ0TEsuaaOhEko9sdpCoPOnRBm2i/XRD2D
             self.cluster_client.post_cluster, gen_model)
 
     @testtools.testcase.attr('negative')
+    @decorators.idempotent_id('262eb132-a857-11e9-9382-00224d6b7bc1')
     def test_create_cluster_with_node_count_0(self):
         gen_model = datagen.valid_cluster_data(
             cluster_template_id=self.cluster_template.uuid, node_count=0)
@@ -230,6 +234,7 @@ Q0uA0aVog3f5iJxCa3Hp5gxbJQ6zV6kJ0TEsuaaOhEko9sdpCoPOnRBm2i/XRD2D
             self.cluster_client.post_cluster, gen_model)
 
     @testtools.testcase.attr('negative')
+    @decorators.idempotent_id('29c6c5f0-a857-11e9-9382-00224d6b7bc1')
     def test_create_cluster_with_zero_masters(self):
         uuid = self.cluster_template.uuid
         gen_model = datagen.valid_cluster_data(cluster_template_id=uuid,
@@ -239,6 +244,7 @@ Q0uA0aVog3f5iJxCa3Hp5gxbJQ6zV6kJ0TEsuaaOhEko9sdpCoPOnRBm2i/XRD2D
             self.cluster_client.post_cluster, gen_model)
 
     @testtools.testcase.attr('negative')
+    @decorators.idempotent_id('2cf16528-a857-11e9-9382-00224d6b7bc1')
     def test_create_cluster_with_nonexisting_flavor(self):
         gen_model = \
             datagen.cluster_template_data_with_valid_keypair_image_flavor()
@@ -256,6 +262,7 @@ Q0uA0aVog3f5iJxCa3Hp5gxbJQ6zV6kJ0TEsuaaOhEko9sdpCoPOnRBm2i/XRD2D
         self.assertEqual(204, resp.status)
 
     @testtools.testcase.attr('negative')
+    @decorators.idempotent_id('33bd0416-a857-11e9-9382-00224d6b7bc1')
     def test_update_cluster_for_nonexisting_cluster(self):
         patch_model = datagen.cluster_name_patch_data()
 
@@ -264,6 +271,7 @@ Q0uA0aVog3f5iJxCa3Hp5gxbJQ6zV6kJ0TEsuaaOhEko9sdpCoPOnRBm2i/XRD2D
             self.cluster_client.patch_cluster, 'fooo', patch_model)
 
     @testtools.testcase.attr('negative')
+    @decorators.idempotent_id('376c45ea-a857-11e9-9382-00224d6b7bc1')
     def test_delete_cluster_for_nonexisting_cluster(self):
         self.assertRaises(
             exceptions.NotFound,
