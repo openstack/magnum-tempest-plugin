@@ -154,8 +154,8 @@ class ClusterClient(client.MagnumClient):
                 self.LOG.info('Cluster %s is created.', cluster_id)
                 return True
             elif model.status in ['ERROR', 'CREATE_FAILED']:
-                self.LOG.error('Cluster %s is in fail state.',
-                               cluster_id)
+                self.LOG.error('Cluster %s is in failed state, status_reason: '
+                               '%s', cluster_id, model.status_reason)
                 raise exceptions.ServerFault(
                     "Got into an error condition: %s for %s" %
                     (model.status, cluster_id))
