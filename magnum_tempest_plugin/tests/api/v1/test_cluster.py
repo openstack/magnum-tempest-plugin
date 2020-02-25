@@ -224,14 +224,20 @@ Q0uA0aVog3f5iJxCa3Hp5gxbJQ6zV6kJ0TEsuaaOhEko9sdpCoPOnRBm2i/XRD2D
             exceptions.BadRequest,
             self.cluster_client.post_cluster, gen_model)
 
-    @testtools.testcase.attr('negative')
+    @testtools.testcase.attr('positive')
+    @testtools.testcase.attr('slow')
     @decorators.idempotent_id('262eb132-a857-11e9-9382-00224d6b7bc1')
-    def test_create_cluster_with_node_count_0(self):
+    def test_create_cluster_with_zero_nodes(self):
         gen_model = datagen.valid_cluster_data(
             cluster_template_id=self.cluster_template.uuid, node_count=0)
-        self.assertRaises(
-            exceptions.BadRequest,
-            self.cluster_client.post_cluster, gen_model)
+
+        # test cluster create
+        _, cluster_model = self._create_cluster(gen_model)
+        self.assertNotIn('status', cluster_model)
+
+        # test cluster delete
+        self._delete_cluster(cluster_model.uuid)
+        self.clusters.remove(cluster_model.uuid)
 
     @testtools.testcase.attr('negative')
     @decorators.idempotent_id('29c6c5f0-a857-11e9-9382-00224d6b7bc1')
