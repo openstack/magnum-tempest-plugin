@@ -35,7 +35,7 @@ def random_int(min_int=1, max_int=100):
 
 def gen_coe_dep_network_driver(coe):
     allowed_driver_types = {
-        'kubernetes': ['flannel', None],
+        'kubernetes': ['flannel', 'calico', None],
         'swarm': ['docker', 'flannel', None],
         'swarm-mode': ['docker', None],
         'mesos': ['docker', None],
@@ -105,7 +105,7 @@ def baymodel_data(**kwargs):
 
     data = {
         "name": data_utils.rand_name('bay'),
-        "coe": "swarm-mode",
+        "coe": "kubernetes",
         "tls_disabled": False,
         "network_driver": None,
         "volume_driver": None,
@@ -210,8 +210,8 @@ def baymodel_valid_data_with_specific_coe(coe):
                          image_id=config.Config.image_id, coe=coe)
 
 
-def valid_swarm_mode_baymodel(is_public=False):
-    """Generates a valid swarm mode baymodel with valid data
+def valid_kubernetes_baymodel(is_public=False):
+    """Generates a valid kubernetes baymodel with valid data
 
     :returns: BayModelEntity with generated data
     """
@@ -221,7 +221,7 @@ def valid_swarm_mode_baymodel(is_public=False):
                          dns_nameserver=config.Config.dns_nameserver,
                          master_flavor_id=config.Config.master_flavor_id,
                          keypair_id=config.Config.keypair_name,
-                         coe="swarm-mode",
+                         coe="kubernetes",
                          cluster_distro=None,
                          external_network_id=config.Config.nic_id,
                          http_proxy=None, https_proxy=None, no_proxy=None,
@@ -346,7 +346,7 @@ def cluster_template_data(**kwargs):
 
     data = {
         "name": data_utils.rand_name('cluster'),
-        "coe": "swarm-mode",
+        "coe": "kubernetes",
         "tls_disabled": False,
         "network_driver": None,
         "volume_driver": None,
