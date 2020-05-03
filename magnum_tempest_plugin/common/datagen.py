@@ -65,8 +65,8 @@ def gen_docker_volume_size(min_int=3, max_int=5):
 
 def gen_fake_ssh_pubkey():
     chars = "".join(
-        random.choice(string.ascii_uppercase +
-                      string.ascii_letters + string.digits + '/+=')
+        random.choice(string.ascii_uppercase
+                      + string.ascii_letters + string.digits + '/+=')
         for _ in range(372))
     return "ssh-rsa " + chars
 

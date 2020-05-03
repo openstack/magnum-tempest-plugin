@@ -48,8 +48,8 @@ class Manager(clients.Manager):
             self.client = client.MagnumClient(auth)
 
     def bypassed_base_url(self, filters, auth_data=None):
-        if (config.Config.magnum_url and
-                filters['service'] == 'container-infra'):
+        if (config.Config.magnum_url
+                and filters['service'] == 'container-infra'):
             return config.Config.magnum_url
         return self.auth_provider.orig_base_url(filters, auth_data=auth_data)
 
