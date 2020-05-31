@@ -55,9 +55,9 @@ master_doc = 'index'
 copyright = u'2017, OpenStack Developers'
 
 # openstackdocstheme options
-repository_name = 'openstack/openstack'
-bug_project = 'magnum_tempest_plugin'
-bug_tag = ''
+openstackdocs_repo_name = 'openstack/magnum-tempest-plugin'
+openstackdocs_bug_project = 'magnum_tempest_plugin'
+openstackdocs_bug_tag = ''
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -99,7 +99,7 @@ exclude_patterns = []
 # show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = 'native'
 
 # A list of ignored prefixes for module index sorting.
 # modindex_common_prefix = []
@@ -147,10 +147,6 @@ html_static_path = ['_static']
 # .htaccess) here, relative to this directory. These files are copied
 # directly to the root of the documentation.
 # html_extra_path = []
-
-# If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
-# using the given strftime format.
-# html_last_updated_fmt = '%b %d, %Y'
 
 # If true, SmartyPants will be used to convert quotes and dashes to
 # typographically correct entities.

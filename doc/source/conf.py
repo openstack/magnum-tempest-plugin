@@ -36,13 +36,13 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'openstack'
+project = u'magnum-tempest-plugin'
 copyright = u'2017, OpenStack Developers'
 
 # openstackdocstheme options
-repository_name = 'openstack/openstack'
-bug_project = 'magnum_tempest_plugin'
-bug_tag = ''
+openstackdocs_repo_name = 'openstack/magnum-tempest-plugin'
+openstackdocs_bug_project = 'magnum_tempest_plugin'
+openstackdocs_bug_tag = ''
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
 add_function_parentheses = True
@@ -52,7 +52,7 @@ add_function_parentheses = True
 add_module_names = True
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = 'native'
 
 # -- Options for HTML output --------------------------------------------------
 
