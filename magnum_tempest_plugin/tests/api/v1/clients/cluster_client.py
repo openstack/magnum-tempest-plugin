@@ -171,4 +171,9 @@ class ClusterClient(client.MagnumClient):
         except exceptions.NotFound:
             self.LOG.warning('Cluster %s is not found.', cluster_id)
             return True
+        except exceptions.BadRequest:
+            self.LOG.warning('Cluster %s returned a bad state. Assuming '
+                             'temporary failure and the cluster still exists.',
+                             cluster_id)
+            return False
         return False
