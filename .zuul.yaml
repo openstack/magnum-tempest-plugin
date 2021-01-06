@@ -13,12 +13,6 @@
 - job:
     name: magnum-tempest-plugin-tests-api
     parent: magnum-tempest-plugin-base
-    # TODO(gmann): Remove the below nodeset setting to Bionic once
-    # https://storyboard.openstack.org/#!/story/2007732 is fixed
-    # Once nodeset is removed form here then devstack-tox-functional job
-    # will automatically run this job on Ubuntu Focal nodeset from
-    # Victoria gate onwards.
-    nodeset: openstack-single-node-bionic
     vars:
       tox_envlist: all
       tempest_test_regex: ^magnum_tempest_plugin.tests.api
