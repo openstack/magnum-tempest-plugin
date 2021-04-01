@@ -16,7 +16,7 @@
     vars:
       tox_envlist: all
       tempest_test_regex: ^magnum_tempest_plugin.tests.api
-      tempest_black_regex: (test_create_list_sign_delete_clusters|test_create_cluster_with_zero_nodes)
+      tempest_exclude_regex: (test_create_list_sign_delete_clusters|test_create_cluster_with_zero_nodes)
       devstack_local_conf:
         test-config:
           $TEMPEST_CONFIG:
