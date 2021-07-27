@@ -27,6 +27,9 @@
               flavor_id: ds2G
               master_flavor_id: ds2G
               copy_logs: true
+      devstack_localrc:
+        # NOTE: extend default glance limit from 1GB
+        GLANCE_LIMIT_IMAGE_SIZE_TOTAL: 5000
 
 - job:
     name: magnum-tempest-plugin-base
