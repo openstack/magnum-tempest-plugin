@@ -5,6 +5,7 @@
     check:
       jobs:
         - magnum-tempest-plugin-tests-api
+        - magnum-tempest-plugin-tests-api-yoga
         - magnum-tempest-plugin-tests-api-xena
         - magnum-tempest-plugin-tests-api-wallaby
         - magnum-tempest-plugin-tests-api-victoria
@@ -12,6 +13,11 @@
       queue: magnum
       jobs:
         - magnum-tempest-plugin-tests-api
+
+- job:
+    name: magnum-tempest-plugin-tests-api-yoga
+    parent: magnum-tempest-plugin-tests-api
+    override-checkout: stable/yoga
 
 - job:
     name: magnum-tempest-plugin-tests-api-xena
