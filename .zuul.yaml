@@ -8,7 +8,6 @@
         - magnum-tempest-plugin-tests-api-yoga
         - magnum-tempest-plugin-tests-api-xena
         - magnum-tempest-plugin-tests-api-wallaby
-        - magnum-tempest-plugin-tests-api-victoria
     gate:
       queue: magnum
       jobs:
@@ -28,11 +27,6 @@
     name: magnum-tempest-plugin-tests-api-wallaby
     parent: magnum-tempest-plugin-tests-api
     override-checkout: stable/wallaby
-
-- job:
-    name: magnum-tempest-plugin-tests-api-victoria
-    parent: magnum-tempest-plugin-tests-api
-    override-checkout: stable/victoria
 
 - job:
     name: magnum-tempest-plugin-tests-api
