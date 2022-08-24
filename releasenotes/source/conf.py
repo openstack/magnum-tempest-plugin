@@ -52,7 +52,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-copyright = u'2017, OpenStack Developers'
+copyright = '2017, OpenStack Developers'
 
 # openstackdocstheme options
 openstackdocs_repo_name = 'openstack/magnum-tempest-plugin'
@@ -196,8 +196,8 @@ htmlhelp_basename = 'magnum_tempest_pluginReleaseNotesdoc'
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     ('index', 'magnum_tempest_pluginReleaseNotes.tex',
-     u'magnum_tempest_plugin  Release Notes Documentation',
-     u'OpenStack Foundation', 'manual'),
+     'magnum_tempest_plugin  Release Notes Documentation',
+     'OpenStack Foundation', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -227,8 +227,8 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'magnum_tempest_pluginrereleasenotes',
-     u'magnum_tempest_plugin  Release Notes Documentation',
-     [u'OpenStack Foundation'], 1)
+     'magnum_tempest_plugin  Release Notes Documentation',
+     ['OpenStack Foundation'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -242,8 +242,8 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     ('index', 'magnum_tempest_plugin ReleaseNotes',
-     u'magnum_tempest_plugin Release Notes Documentation',
-     u'OpenStack Foundation', 'magnum_tempest_pluginReleaseNotes',
+     'magnum_tempest_plugin Release Notes Documentation',
+     'OpenStack Foundation', 'magnum_tempest_pluginReleaseNotes',
      'One line description of project.',
      'Miscellaneous'),
 ]
