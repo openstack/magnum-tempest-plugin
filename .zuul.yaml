@@ -1,4 +1,5 @@
 - project:
+    queue: magnum
     templates:
       - check-requirements
       - tempest-plugin-jobs
@@ -9,7 +10,6 @@
         - magnum-tempest-plugin-tests-api-xena
         - magnum-tempest-plugin-tests-api-wallaby
     gate:
-      queue: magnum
       jobs:
         - magnum-tempest-plugin-tests-api
 
