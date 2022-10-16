@@ -6,12 +6,19 @@
     check:
       jobs:
         - magnum-tempest-plugin-tests-api
+        - magnum-tempest-plugin-tests-api-zed
         - magnum-tempest-plugin-tests-api-yoga
         - magnum-tempest-plugin-tests-api-xena
         - magnum-tempest-plugin-tests-api-wallaby
     gate:
       jobs:
         - magnum-tempest-plugin-tests-api
+
+- job:
+    name: magnum-tempest-plugin-tests-api-zed
+    parent: magnum-tempest-plugin-tests-api
+    nodeset: openstack-single-node-focal
+    override-checkout: stable/zed
 
 - job:
     name: magnum-tempest-plugin-tests-api-yoga
