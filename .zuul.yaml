@@ -16,16 +16,19 @@
 - job:
     name: magnum-tempest-plugin-tests-api-yoga
     parent: magnum-tempest-plugin-tests-api
+    nodeset: openstack-single-node-focal
     override-checkout: stable/yoga
 
 - job:
     name: magnum-tempest-plugin-tests-api-xena
     parent: magnum-tempest-plugin-tests-api
+    nodeset: openstack-single-node-focal
     override-checkout: stable/xena
 
 - job:
     name: magnum-tempest-plugin-tests-api-wallaby
     parent: magnum-tempest-plugin-tests-api
+    nodeset: openstack-single-node-focal
     override-checkout: stable/wallaby
 
 - job:
