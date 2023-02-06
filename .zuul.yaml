@@ -9,7 +9,6 @@
         - magnum-tempest-plugin-tests-api-zed
         - magnum-tempest-plugin-tests-api-yoga
         - magnum-tempest-plugin-tests-api-xena
-        - magnum-tempest-plugin-tests-api-wallaby
     gate:
       jobs:
         - magnum-tempest-plugin-tests-api
@@ -31,12 +30,6 @@
     parent: magnum-tempest-plugin-tests-api
     nodeset: openstack-single-node-focal
     override-checkout: stable/xena
-
-- job:
-    name: magnum-tempest-plugin-tests-api-wallaby
-    parent: magnum-tempest-plugin-tests-api
-    nodeset: openstack-single-node-focal
-    override-checkout: stable/wallaby
 
 - job:
     name: magnum-tempest-plugin-tests-api
