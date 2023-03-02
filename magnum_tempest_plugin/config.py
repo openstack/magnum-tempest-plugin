@@ -14,18 +14,30 @@ from oslo_config import cfg
 from tempest import config  # noqa
 
 
-service_available_group = cfg.OptGroup(name="service_available",
-                                       title="Available OpenStack Services")
+magnum_scope_enforcement = cfg.BoolOpt('magnum',
+                                       default=False,
+                                       help="Does the Magnum service API "
+                                            "policies enforce scope? "
+                                            "This configuration value should "
+                                            "be same as magnum.conf: "
+                                            "[oslo_policy].enforce_scope "
+                                            "option.")
 
-ServiceAvailableGroup = [
-    cfg.BoolOpt("magnum",
-                default=True,
-                help="Whether or not magnum is expected to be available"),
-]
+service_option = cfg.BoolOpt(
+    "magnum", default=True,
+    help="Whether or not magnum is expected to be available")
 
 magnum_group = cfg.OptGroup(name="magnum", title="Magnum Options")
 
 MagnumGroup = [
+    cfg.StrOpt("catalog_type",
+               default="container-infra",
+               help="Catalog type of the coe service."),
+    cfg.StrOpt('endpoint_type',
+               default='publicURL',
+               choices=['public', 'admin', 'internal',
+                        'publicURL', 'adminURL', 'internalURL'],
+               help="The endpoint type to use for the coe service."),
     cfg.StrOpt("docker_storage_driver",
                help="Docker storage driver. Supported: devicemapper, overlay"),
     cfg.StrOpt("image_id",

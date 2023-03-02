@@ -21,12 +21,22 @@ from magnum_tempest_plugin.common import config
 class MagnumClient(rest_client.RestClient, metaclass=abc.ABCMeta):
     """Abstract class responsible for setting up auth provider"""
 
-    def __init__(self, auth_provider):
+    def __init__(self, auth_provider, **kwargs):
+        service = kwargs.pop(
+            "service"
+        ) if "service" in kwargs else 'container-infra'
+        region = kwargs.pop(
+            "region"
+        ) if "region" in kwargs else config.Config.region
+        disable_validation = kwargs.pop(
+            "disable_ssl_certificate_validation"
+        ) if "disable_ssl_certificate_validation" in kwargs else True
         super(MagnumClient, self).__init__(
             auth_provider=auth_provider,
-            service='container-infra',
-            region=config.Config.region,
-            disable_ssl_certificate_validation=True
+            service=service,
+            region=region,
+            disable_ssl_certificate_validation=disable_validation,
+            **kwargs
         )
 
     @classmethod

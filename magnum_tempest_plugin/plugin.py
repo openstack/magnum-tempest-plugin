@@ -28,14 +28,30 @@ class MagnumTempestPlugin(plugins.TempestPlugin):
         return full_test_dir, base_path
 
     def register_opts(self, conf):
-        config.register_opt_group(
-            conf, magnum_config.service_available_group,
-            magnum_config.ServiceAvailableGroup)
-        config.register_opt_group(conf, magnum_config.magnum_group,
-                                  magnum_config.MagnumGroup)
+        conf.register_opt(magnum_config.service_option,
+                          group='service_available')
+        conf.register_opt(magnum_config.magnum_scope_enforcement,
+                          group='enforce_scope')
+        conf.register_group(magnum_config.magnum_group)
+        conf.register_opts(magnum_config.MagnumGroup, group='magnum')
 
     def get_opt_lists(self):
         return [
             (magnum_config.magnum_group.name, magnum_config.MagnumGroup),
-            ('service_available', magnum_config.ServiceAvailableGroup)
+            ('service_available', [magnum_config.service_option]),
+            ('enforce_scope', [magnum_config.magnum_scope_enforcement])
         ]
+
+    def get_service_clients(self):
+        magnum_config = config.service_client_config('magnum')
+        v1_params = {
+            'name': 'magnum_v1',
+            'service_version': 'magnum.v1',
+            'module_path': 'magnum_tempest_plugin.tests.api.v1.clients',
+            'client_names': [
+                'CertClient', 'ClusterTemplateClient',
+                'ClusterClient', 'MagnumServiceClient'
+            ]
+        }
+        v1_params.update(magnum_config)
+        return [v1_params]
