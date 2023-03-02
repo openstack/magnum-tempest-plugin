@@ -6,6 +6,7 @@
     check:
       jobs:
         - magnum-tempest-plugin-tests-api
+        - magnum-tempest-plugin-tests-api-rbac
         - magnum-tempest-plugin-tests-api-2023-1
         - magnum-tempest-plugin-tests-api-zed
         - magnum-tempest-plugin-tests-api-yoga
@@ -37,6 +38,19 @@
     parent: magnum-tempest-plugin-tests-api
     nodeset: openstack-single-node-focal
     override-checkout: stable/xena
+
+- job:
+    name: magnum-tempest-plugin-tests-api-rbac
+    parent: magnum-tempest-plugin-tests-api
+    vars:
+      tempest_test_regex: ^magnum_tempest_plugin.tests.api.v1.rbac
+      devstack_localrc:
+        MAGNUM_ENFORCE_SCOPE: true
+      devstack_local_conf:
+        test-config:
+          $TEMPEST_CONFIG:
+            enforce_scope:
+              magnum: true
 
 - job:
     name: magnum-tempest-plugin-tests-api
