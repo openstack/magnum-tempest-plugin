@@ -6,12 +6,19 @@
     check:
       jobs:
         - magnum-tempest-plugin-tests-api
+        - magnum-tempest-plugin-tests-api-2023-1
         - magnum-tempest-plugin-tests-api-zed
         - magnum-tempest-plugin-tests-api-yoga
         - magnum-tempest-plugin-tests-api-xena
     gate:
       jobs:
         - magnum-tempest-plugin-tests-api
+
+- job:
+    name: magnum-tempest-plugin-tests-api-2023-1
+    parent: magnum-tempest-plugin-tests-api
+    nodeset: openstack-single-node-jammy
+    override-checkout: stable/2023.1
 
 - job:
     name: magnum-tempest-plugin-tests-api-zed
