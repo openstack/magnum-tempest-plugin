@@ -10,6 +10,7 @@
         - magnum-tempest-plugin-tests-api-2023-1
         - magnum-tempest-plugin-tests-api-zed
         - magnum-tempest-plugin-tests-api-yoga
+        - magnum-tempest-plugin-tests-cluster-k8s_fcos_v1
     gate:
       jobs:
         - magnum-tempest-plugin-tests-api
@@ -46,6 +47,10 @@
               magnum: true
 
 - job:
+    name: magnum-tempest-plugin-tests-cluster-k8s_fcos_v1
+    parent: magnum-tempest-plugin-tests-cluster
+
+- job:
     name: magnum-tempest-plugin-tests-api
     parent: magnum-tempest-plugin-base
     vars:
@@ -56,15 +61,37 @@
         test-config:
           $TEMPEST_CONFIG:
             magnum:
-              image_id: fedora-coreos-31.20200323.3.2-openstack.x86_64
+              image_id: fedora-coreos-38.20230806.3.0-openstack.x86_64
               nic_id: public
               keypair_id: default
               flavor_id: ds2G
               master_flavor_id: ds2G
               copy_logs: true
+
+- job:
+    name: magnum-tempest-plugin-tests-cluster
+    parent: magnum-tempest-plugin-base
+    nodeset: magnum-nested-virt-ubuntu-jammy
+    vars:
+      configure_swap_size: 8192
+      tox_envlist: all
+      tempest_test_regex: ^magnum_tempest_plugin.tests.api.v1.test_cluster.ClusterTest.test_create_list_sign_delete_clusters
+      devstack_local_conf:
+        test-config:
+          $TEMPEST_CONFIG:
+            magnum:
+              image_id: fedora-coreos-38.20230806.3.0-openstack.x86_64
+              nic_id: public
+              keypair_id: default
+              flavor_id: ds2G
+              master_flavor_id: ds2G
+              copy_logs: true
+              copy_logs_sucess: true
       devstack_localrc:
-        # NOTE: extend default glance limit from 1GB
-        GLANCE_LIMIT_IMAGE_SIZE_TOTAL: 5000
+        LIBVIRT_TYPE: kvm
+        LIBVIRT_CPU_MODE: host-passthrough
+      zuul_copy_output:
+        /tmp/magnum-nodes: logs
 
 - job:
     name: magnum-tempest-plugin-base
@@ -72,22 +99,23 @@
       Magnum functional tests base layer
     parent: devstack-tempest
     required-projects:
-      - openstack/magnum
-      - openstack/python-magnumclient
-      - openstack/heat
       - openstack/barbican
+      - openstack/heat
+      - openstack/magnum
       - openstack/magnum-tempest-plugin
+      - openstack/python-magnumclient
     vars:
       tempest_plugins:
         - magnum-tempest-plugin
       devstack_localrc:
         USE_PYTHON3: true
-        MAGNUM_GUEST_IMAGE_URL: https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/31.20200323.3.2/x86_64/fedora-coreos-31.20200323.3.2-openstack.x86_64.qcow2.xz
-        MAGNUM_IMAGE_NAME: fedora-coreos-31.20200323.3.2-openstack.x86_64
+        GLANCE_LIMIT_IMAGE_SIZE_TOTAL: 5000
+        MAGNUM_GUEST_IMAGE_URL: https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/38.20230806.3.0/x86_64/fedora-coreos-38.20230806.3.0-openstack.x86_64.qcow2.xz
+        MAGNUM_IMAGE_NAME: fedora-coreos-38.20230806.3.0-openstack.x86_64
       devstack_plugins:
-        magnum: https://opendev.org/openstack/magnum
         heat: https://opendev.org/openstack/heat
         barbican: https://opendev.org/openstack/barbican
+        magnum: https://opendev.org/openstack/magnum
       devstack_services:
         # Disable swift and dependent c-bak service to support upload of .qcow2.xz image in the gate
         s-account: false
@@ -103,3 +131,14 @@
       - ^install-guide/.*$
       - ^releasenotes/.*$
       - ^dockerfiles/.*$
+
+- nodeset:
+    name: magnum-nested-virt-ubuntu-jammy
+    nodes:
+      - name: controller
+        label: nested-virt-ubuntu-jammy
+    groups:
+      - name: tempest
+        nodes:
+          - controller
+

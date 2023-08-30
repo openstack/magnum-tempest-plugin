@@ -16,6 +16,11 @@ import inspect
 import time
 import types
 
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives import serialization
+from cryptography import x509
+
 
 def def_method(f, *args, **kwargs):
     @functools.wraps(f)
@@ -109,3 +114,34 @@ def memoized(func):
             cache[args] = value
             return value
     return wrapper
+
+
+def generate_csr_and_key():
+    """Return a dict with a new csr, public key and private key."""
+    private_key = rsa.generate_private_key(
+        public_exponent=65537,
+        key_size=2048
+    )
+
+    public_key = private_key.public_key()
+
+    csr = x509.CertificateSigningRequestBuilder().subject_name(x509.Name([
+        x509.NameAttribute(x509.oid.NameOID.COMMON_NAME, u"admin"),
+        x509.NameAttribute(x509.oid.NameOID.ORGANIZATION_NAME,
+                           u"system:masters")
+    ])).sign(private_key, hashes.SHA256())
+
+    result = {
+        'csr': csr.public_bytes(
+            encoding=serialization.Encoding.PEM).decode("utf-8"),
+        'private_key': private_key.private_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PrivateFormat.TraditionalOpenSSL,
+            encryption_algorithm=serialization.NoEncryption()).decode("utf-8"),
+        'public_key': public_key.public_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PublicFormat.SubjectPublicKeyInfo).decode(
+                "utf-8"),
+    }
+
+    return result

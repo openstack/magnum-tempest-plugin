@@ -10,7 +10,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from magnum_tempest_plugin.common import config
 from magnum_tempest_plugin.common.templates import cluster
 
 IDEMPOTENT_IDS = {
@@ -72,13 +71,3 @@ class ClusterTest(cluster.ClusterTestTemplate):
             cls._setup_cluster_template()
         except Exception:
             raise
-
-    @classmethod
-    def tearDownClass(cls):
-        if cls.delete_template:
-            cls._delete_cluster_template(cls.cluster_template.uuid)
-
-        if config.Config.keypair_name:
-            cls.keypairs_client.delete_keypair(config.Config.keypair_name)
-
-        super(ClusterTest, cls).tearDownClass()

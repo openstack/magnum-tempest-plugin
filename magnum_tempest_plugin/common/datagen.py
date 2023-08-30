@@ -270,9 +270,10 @@ def valid_cluster_template(is_public=False):
         external_network_id=config.Config.nic_id,
         http_proxy=None, https_proxy=None,
         no_proxy=None, network_driver=config.Config.network_driver,
-        volume_driver=None, labels={},
+        volume_driver=None,
         docker_storage_driver=config.Config.docker_storage_driver,
-        tls_disabled=False)
+        tls_disabled=False,
+        labels=config.Config.labels)
 
 
 def cluster_data(name=data_utils.rand_name('cluster'),

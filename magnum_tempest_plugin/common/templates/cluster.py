@@ -12,15 +12,20 @@
 
 import fixtures
 
+import kubernetes
+from kubernetes.client.rest import ApiException
 from oslo_log import log as logging
+from oslo_serialization import base64
 from oslo_utils import uuidutils
 from tempest.lib.common.utils import data_utils
 from tempest.lib import decorators
 from tempest.lib import exceptions
 import testtools
+from yaml import safe_load
 
 from magnum_tempest_plugin.common import config
 from magnum_tempest_plugin.common import datagen
+from magnum_tempest_plugin.common import utils
 from magnum_tempest_plugin.tests.api import base
 
 
@@ -109,17 +114,30 @@ class ClusterTestTemplate(base.BaseTempestTest):
         self.assertTrue(uuidutils.is_uuid_like(model.uuid))
         self.clusters.append(model.uuid)
         self.cluster_uuid = model.uuid
-        if config.Config.copy_logs:
-            self.addCleanup(self.copy_logs_handler(
+
+        timeout = (config.Config.cluster_creation_timeout + 10) * 60
+        try:
+            self.cluster_admin_client.wait_for_created_cluster(
+                model.uuid, delete_on_error=False, timeout=timeout)
+        except Exception as e:
+            self.LOG.debug("Cluster create exception: %s\n" % e)
+            self.copy_logs_handler(
                 lambda: list(
                     [self._get_cluster_by_id(model.uuid)[1].master_addresses,
                      self._get_cluster_by_id(model.uuid)[1].node_addresses]),
                 self.cluster_template.coe,
-                self.keypair))
+                self.keypair)
+            raise
 
-        timeout = config.Config.cluster_creation_timeout * 60
-        self.cluster_admin_client.wait_for_created_cluster(
-            model.uuid, delete_on_error=False, timeout=timeout)
+        if config.Config.copy_logs_success:
+            self.LOG.debug('Copying logs on success')
+            self.copy_logs_handler(
+                lambda: list(
+                    [self._get_cluster_by_id(model.uuid)[1].master_addresses,
+                     self._get_cluster_by_id(model.uuid)[1].node_addresses]),
+                self.cluster_template.coe,
+                self.keypair)
+
         return resp, model
 
     def _delete_cluster(self, cluster_id):
@@ -152,6 +170,8 @@ class ClusterTestTemplate(base.BaseTempestTest):
         _, cluster_model = self._create_cluster(gen_model)
         self.assertNotIn('status', cluster_model)
 
+        _, cluster_model = self._get_cluster_by_id(cluster_model.uuid)
+
         # test cluster list
         resp, cluster_list_model = self.cluster_reader_client.list_clusters()
         self.assertEqual(200, resp.status)
@@ -161,32 +181,19 @@ class ClusterTestTemplate(base.BaseTempestTest):
                                       for x in cluster_list_model.clusters]))
 
         # test ca show
-        resp, cert_model = self.cert_reader_client.get_cert(
+        resp, ca = self.cert_reader_client.get_cert(
             cluster_model.uuid, headers=HEADERS)
         self.LOG.debug("cert resp: %s", resp)
         self.assertEqual(200, resp.status)
-        self.assertEqual(cert_model.cluster_uuid, cluster_model.uuid)
-        self.assertIsNotNone(cert_model.pem)
-        self.assertIn('-----BEGIN CERTIFICATE-----', cert_model.pem)
-        self.assertIn('-----END CERTIFICATE-----', cert_model.pem)
+        self.assertEqual(ca.cluster_uuid, cluster_model.uuid)
+        self.assertIsNotNone(ca.pem)
+        self.assertIn('-----BEGIN CERTIFICATE-----', ca.pem)
+        self.assertIn('-----END CERTIFICATE-----', ca.pem)
 
         # test ca sign
-        csr_sample = """-----BEGIN CERTIFICATE REQUEST-----
-MIIByjCCATMCAQAwgYkxCzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlh
-MRYwFAYDVQQHEw1Nb3VudGFpbiBWaWV3MRMwEQYDVQQKEwpHb29nbGUgSW5jMR8w
-HQYDVQQLExZJbmZvcm1hdGlvbiBUZWNobm9sb2d5MRcwFQYDVQQDEw53d3cuZ29v
-Z2xlLmNvbTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEApZtYJCHJ4VpVXHfV
-IlstQTlO4qC03hjX+ZkPyvdYd1Q4+qbAeTwXmCUKYHThVRd5aXSqlPzyIBwieMZr
-WFlRQddZ1IzXAlVRDWwAo60KecqeAXnnUK+5fXoTI/UgWshre8tJ+x/TMHaQKR/J
-cIWPhqaQhsJuzZbvAdGA80BLxdMCAwEAAaAAMA0GCSqGSIb3DQEBBQUAA4GBAIhl
-4PvFq+e7ipARgI5ZM+GZx6mpCz44DTo0JkwfRDf+BtrsaC0q68eTf2XhYOsq4fkH
-Q0uA0aVog3f5iJxCa3Hp5gxbJQ6zV6kJ0TEsuaaOhEko9sdpCoPOnRBm2i/XRD2D
-6iNh8f8z0ShGsFqjDgFHyF3o+lUyj+UC6H1QW7bn
------END CERTIFICATE REQUEST-----
-"""
-
+        csr_sample = utils.generate_csr_and_key()
         cert_data_model = datagen.cert_data(cluster_model.uuid,
-                                            csr_data=csr_sample)
+                                            csr_data=csr_sample['csr'])
         resp, cert_model = self.cert_member_client.post_cert(
             cert_data_model, headers=HEADERS)
         self.LOG.debug("cert resp: %s", resp)
@@ -195,6 +202,60 @@ Q0uA0aVog3f5iJxCa3Hp5gxbJQ6zV6kJ0TEsuaaOhEko9sdpCoPOnRBm2i/XRD2D
         self.assertIsNotNone(cert_model.pem)
         self.assertIn('-----BEGIN CERTIFICATE-----', cert_model.pem)
         self.assertIn('-----END CERTIFICATE-----', cert_model.pem)
+
+        # test Kubernetes API
+        kube_cfg = """
+---
+apiVersion: v1
+clusters:
+  - cluster:
+      certificate-authority-data: {ca}
+      server: {api_address}
+    name: {name}
+contexts:
+  - context:
+      cluster: {name}
+      user: admin
+    name: default
+current-context: default
+kind: Config
+preferences: {{}}
+users:
+  - name: admin
+    user:
+      client-certificate-data: {cert}
+      client-key-data: {key}
+""".format(name=cluster_model.name,
+           api_address=cluster_model.api_address,
+           key=base64.encode_as_text(csr_sample['private_key']),
+           cert=base64.encode_as_text(cert_model.pem),
+           ca=base64.encode_as_text(ca.pem))
+
+        kube_cfg = safe_load(kube_cfg)
+        kube_config = kubernetes.config.load_kube_config_from_dict(kube_cfg)
+
+        # Get nodes and pods list using kubernetes python client
+        with kubernetes.client.ApiClient(kube_config) as api_client:
+            v1 = kubernetes.client.CoreV1Api(api_client)
+            try:
+                list_nodes = v1.list_node(pretty="true")
+                with open("/tmp/magnum-nodes/api-list-nodes", "w") as outfile:
+                    outfile.write(str(list_nodes))
+                list_pods = v1.list_pod_for_all_namespaces(pretty="true")
+                with open("/tmp/magnum-nodes/api-list-pods", "w") as outfile:
+                    outfile.write(str(list_pods))
+            except ApiException as e:
+                print("Exception when calling CoreV1Api: %s\n" % e)
+                raise
+
+        # Get nodes and pods using kubectl
+        with open("/tmp/magnum-nodes/kube.conf", "w") as outfile:
+            outfile.write(str(kube_cfg))
+        try:
+            self.copy_pod_logs()
+        except Exception as e:
+            self.LOG.debug("kubectl exception: %s\n" % e)
+            raise
 
         # test cluster delete
         self._delete_cluster(cluster_model.uuid)

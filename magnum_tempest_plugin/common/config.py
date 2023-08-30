@@ -10,6 +10,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import ast
 import warnings
 
 from tempest import config
@@ -137,9 +138,8 @@ class Config(object):
 
     @classmethod
     def set_copy_logs(cls, config):
-        if 'copy_logs' not in CONF.magnum:
-            cls.copy_logs = True
-        cls.copy_logs = str(CONF.magnum.copy_logs).lower() == 'true'
+        cls.copy_logs = CONF.magnum.get('copy_logs', True)
+        cls.copy_logs_success = CONF.magnum.get('copy_logs_success', True)
 
     @classmethod
     def set_coe(cls, config):
@@ -156,6 +156,10 @@ class Config(object):
     @classmethod
     def set_cluster_creation_timeout(cls, config):
         cls.cluster_creation_timeout = CONF.magnum.cluster_creation_timeout
+
+    @classmethod
+    def set_labels(cls, config):
+        cls.labels = ast.literal_eval(CONF.magnum.labels)
 
     @classmethod
     def setUp(cls):
@@ -180,3 +184,4 @@ class Config(object):
         cls.set_network_driver(config)
         cls.set_cluster_template_id(config)
         cls.set_cluster_creation_timeout(config)
+        cls.set_labels(config)

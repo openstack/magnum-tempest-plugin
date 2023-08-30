@@ -22,6 +22,7 @@ import magnum_tempest_plugin
 
 CONF = config.CONF
 COPY_LOG_HELPER = "magnum_tempest_plugin/tests/contrib/copy_instance_logs.sh"
+COPY_PODLOG_HELPER = "magnum_tempest_plugin/tests/contrib/copy_pod_logs.sh"
 
 
 class BaseMagnumTest(test.BaseTestCase):
@@ -55,11 +56,9 @@ class BaseMagnumTest(test.BaseTestCase):
         """
         def int_copy_logs():
             try:
-                cls.LOG.info("Copying logs...")
                 func_name = "test"
                 msg = ("Failed to copy logs for cluster")
                 nodes_addresses = get_nodes_fn()
-
                 master_nodes = nodes_addresses[0]
                 slave_nodes = nodes_addresses[1]
 
@@ -92,13 +91,33 @@ class BaseMagnumTest(test.BaseTestCase):
                                 "to %(base_path)s%(log_name)s-"
                                 "%(node_address)s" %
                                 {'node_address': node_address,
-                                 'base_path': "/opt/stack/logs/cluster-nodes/",
+                                 'base_path': "/opt/stack/logs/magnum-nodes/",
                                  'log_name': log_name})
                             cls.LOG.exception(msg)
+                            raise
 
                 do_copy_logs('master', master_nodes)
                 do_copy_logs('node', slave_nodes)
             except Exception:
                 cls.LOG.exception(msg)
+                raise
 
-        return int_copy_logs
+        return int_copy_logs()
+
+    @classmethod
+    def copy_pod_logs(cls):
+        """Copy pod logs
+
+        This method will retrieve all pod logs using bash script,
+        expects a kube.config file under /tmp/magnum-nodes/
+        """
+        base_path = os.path.split(os.path.dirname(
+            os.path.abspath(magnum_tempest_plugin.__file__)))[0]
+        full_location = os.path.join(base_path, COPY_PODLOG_HELPER)
+
+        try:
+            cls.LOG.debug("running %s", full_location)
+            subprocess.check_call([full_location])
+        except Exception as e:
+            cls.LOG.exception(e)
+            raise

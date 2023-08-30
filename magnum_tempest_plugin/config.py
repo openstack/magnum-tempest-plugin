@@ -69,6 +69,9 @@ MagnumGroup = [
     cfg.BoolOpt("copy_logs",
                 default=True,
                 help="Specify whether to copy nova server logs on failure."),
+    cfg.BoolOpt("copy_logs_success",
+                default=True,
+                help="Specify whether to copy nova server logs on success."),
     cfg.StrOpt("coe",
                default="kubernetes",
                help="Container Orchestration Engine"),
@@ -80,4 +83,7 @@ MagnumGroup = [
                default=30,
                help="Timeout(in minutes) to wait for the cluster creation "
                     "finished."),
+    cfg.StrOpt("labels",
+               default={},
+               help="A dict of labels to be defined in cluster template"),
 ]
