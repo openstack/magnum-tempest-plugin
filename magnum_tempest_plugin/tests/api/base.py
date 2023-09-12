@@ -95,7 +95,7 @@ class BaseTempestTest(base.BaseMagnumTest):
         elif "default" == type_of_creds:
             creds = ic.get_primary_creds()
         else:
-            creds = ic.self.get_credentials(type_of_creds)
+            creds = ic.get_credentials(type_of_creds)
 
         keypair = None
 
