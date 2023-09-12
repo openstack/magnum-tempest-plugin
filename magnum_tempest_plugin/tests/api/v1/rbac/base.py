@@ -62,6 +62,8 @@ class RbacBaseTests(base.BaseMagnumTest):
         cls.cert_reader_client = cls.project_reader.CertClient()
         cls.cert_member_client = cls.project_member.CertClient()
         cls.cert_admin_client = cls.project_admin.CertClient()
+        cls.service_member_client = cls.project_member.MagnumServiceClient()
+        cls.service_admin_client = cls.project_admin.MagnumServiceClient()
 
     @classmethod
     def setup_credentials(cls):
