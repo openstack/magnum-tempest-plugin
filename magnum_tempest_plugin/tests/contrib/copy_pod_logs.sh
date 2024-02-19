@@ -34,6 +34,7 @@ ${KUBECTL} get all -A -o wide > ${LOG_DIR}/kubectl_get_all
 for ns in $(${KUBECTL} get -o name namespace); do
     mkdir -p ${LOG_DIR}/pods/${ns#*/}
     for pod in $(${KUBECTL} get -n ${ns#*/} -o name pod); do
+        ${KUBECTL} -n ${ns#*/} describe pod ${pod#*/} > ${LOG_DIR}/pods/${ns#*/}/${pod#*/}_describe
         ${KUBECTL} -n ${ns#*/} logs ${pod#*/} > ${LOG_DIR}/pods/${ns#*/}/${pod#*/}
     done
 done
