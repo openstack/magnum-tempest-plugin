@@ -1,0 +1,63 @@
+---
+- job:
+    name: magnum-tempest-plugin-tests-api-2023-2
+    parent: magnum-tempest-plugin-tests-api-base
+    nodeset: openstack-single-node-jammy
+    override-checkout: stable/2023.2
+    vars:
+      devstack_localrc:
+        MAGNUM_GUEST_IMAGE_URL: https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/38.20230806.3.0/x86_64/fedora-coreos-38.20230806.3.0-openstack.x86_64.qcow2.xz
+      devstack_local_conf:
+        test-config:
+          $TEMPEST_CONFIG:
+            magnum:
+              image_id: fedora-coreos-38.20230806.3.0-openstack.x86_64
+
+- job:
+    name: magnum-tempest-plugin-tests-cluster-2023-2
+    parent: magnum-tempest-plugin-tests-cluster-base
+    nodeset: magnum-nested-virt-ubuntu-jammy
+    override-checkout: stable/2023.2
+    vars:
+      devstack_localrc:
+        MAGNUM_GUEST_IMAGE_URL: https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/38.20230806.3.0/x86_64/fedora-coreos-38.20230806.3.0-openstack.x86_64.qcow2.xz
+      devstack_local_conf:
+        test-config:
+          $TEMPEST_CONFIG:
+            magnum:
+              image_id: fedora-coreos-38.20230806.3.0-openstack.x86_64
+
+- job:
+    name: magnum-tempest-plugin-tests-cluster-2023-2-k8s_fcos_v1-v1.26.8
+    parent: magnum-tempest-plugin-tests-cluster-2023-2
+    vars:
+      devstack_local_conf:
+        test-config:
+          $TEMPEST_CONFIG:
+            magnum:
+              labels:
+                kube_tag: v1.26.8-rancher1
+                flannel_tag: v0.21.5
+                master_lb_floating_ip_enabled: true
+                cinder_csi_enabled: true
+                container_runtime: containerd
+                containerd_version: 1.6.20
+                containerd_tarball_sha256: 1d86b534c7bba51b78a7eeb1b67dd2ac6c0edeb01c034cc5f590d5ccd824b416
+                cloud_provider_tag: v1.26.3
+                cinder_csi_plugin_tag: v1.26.3
+                k8s_keystone_auth_tag: v1.26.3
+                coredns_tag: 1.10.1
+                csi_snapshotter_tag: v6.2.1
+                csi_attacher_tag: v4.2.0
+                csi_resizer_tag: v1.7.0
+                csi_provisioner_tag: v3.4.1
+                csi_node_driver_registrar_tag: v2.8.0
+
+- project-template:
+    name: magnum-tempest-plugin-jobs-2023-2
+    check:
+      jobs:
+        - magnum-tempest-plugin-tests-api-2023-2
+    gate:
+      jobs:
+        - magnum-tempest-plugin-tests-api-2023-2

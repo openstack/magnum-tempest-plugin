@@ -1,0 +1,88 @@
+---
+- job:
+    name: magnum-tempest-plugin-base
+    description: |
+      Magnum functional tests base layer
+    parent: devstack-tempest
+    required-projects:
+      - openstack/barbican
+      - openstack/heat
+      - openstack/magnum
+      - openstack/magnum-tempest-plugin
+      - openstack/python-magnumclient
+    vars:
+      tempest_plugins:
+        - magnum-tempest-plugin
+      devstack_localrc:
+        GLANCE_LIMIT_IMAGE_SIZE_TOTAL: 5000
+      devstack_plugins:
+        heat: https://opendev.org/openstack/heat
+        barbican: https://opendev.org/openstack/barbican
+        magnum: https://opendev.org/openstack/magnum
+      devstack_services:
+        # Disable swift and dependent c-bak service to support upload of .qcow2.xz image in the gate
+        s-account: false
+        s-container: false
+        s-object: false
+        s-proxy: false
+        c-bak: false
+    irrelevant-files:
+      - ^.*\.rst$
+      - ^api-ref/.*$
+      - ^doc/.*$
+      - ^specs/.*$
+      - ^install-guide/.*$
+      - ^releasenotes/.*$
+      - ^dockerfiles/.*$
+
+- job:
+    name: magnum-tempest-plugin-tests-api-base
+    parent: magnum-tempest-plugin-base
+    vars:
+      tox_envlist: all
+      tempest_test_regex: ^magnum_tempest_plugin.tests.api
+      tempest_exclude_regex: (test_create_list_sign_delete_clusters|test_create_cluster_with_zero_nodes)
+      devstack_local_conf:
+        test-config:
+          $TEMPEST_CONFIG:
+            magnum:
+              nic_id: public
+              keypair_id: default
+              flavor_id: ds2G
+              master_flavor_id: ds2G
+              copy_logs: true
+
+- job:
+    name: magnum-tempest-plugin-tests-cluster-base
+    parent: magnum-tempest-plugin-base
+    nodeset: magnum-nested-virt-ubuntu-jammy
+    vars:
+      configure_swap_size: 8192
+      tox_envlist: all
+      tempest_test_regex: ^magnum_tempest_plugin.tests.api.v1.test_cluster.ClusterTest.test_create_list_sign_delete_clusters
+      devstack_localrc:
+        LIBVIRT_TYPE: kvm
+        LIBVIRT_CPU_MODE: host-passthrough
+      devstack_local_conf:
+        test-config:
+          $TEMPEST_CONFIG:
+            magnum:
+              nic_id: public
+              keypair_id: default
+              flavor_id: ds2G
+              master_flavor_id: ds2G
+              copy_logs: true
+              copy_logs_sucess: true
+      zuul_copy_output:
+        /tmp/magnum-nodes: logs
+
+- nodeset:
+    name: magnum-nested-virt-ubuntu-jammy
+    nodes:
+      - name: controller
+        label: nested-virt-ubuntu-jammy
+    groups:
+      - name: tempest
+        nodes:
+          - controller
+
