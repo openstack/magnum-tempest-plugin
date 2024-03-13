@@ -16,28 +16,37 @@ set -o xtrace
 
 LOG_DIR="/tmp/magnum-nodes/kubernetes/"
 KUBECTL="/opt/stack/bin/kubectl --kubeconfig /tmp/magnum-nodes/kube.conf"
+
+function gather_kube_logs {
+    ${KUBECTL} get all -A -o wide > ${LOG_DIR}/kubectl_get_all
+
+    for ns in $(${KUBECTL} get -o name namespace); do
+        mkdir -p ${LOG_DIR}/pods/${ns#*/}
+        for pod in $(${KUBECTL} get -n ${ns#*/} -o name pod); do
+            ${KUBECTL} -n ${ns#*/} describe pod ${pod#*/} > ${LOG_DIR}/pods/${ns#*/}/${pod#*/}_describe
+            ${KUBECTL} -n ${ns#*/} logs ${pod#*/} > ${LOG_DIR}/pods/${ns#*/}/${pod#*/}
+        done
+    done
+}
+    
 mkdir -p ${LOG_DIR}
+
+echo "INFO: Waiting 5 minutes for Pods to start up"
+sleep 300
 
 while ${KUBECTL} get pods -A -o wide | grep -q "ContainerCreating";
 do
     count=$(( $count+1 ))
-    if [ "$count" = "10" ]; then
+    if [ "$count" = "100" ]; then
         echo "ERROR: Waiting for pods to exit ContainerCreating state timed out"
+        gather_kube_logs
         exit 1
     else
         sleep 60
     fi
 done
 
-${KUBECTL} get all -A -o wide > ${LOG_DIR}/kubectl_get_all
-
-for ns in $(${KUBECTL} get -o name namespace); do
-    mkdir -p ${LOG_DIR}/pods/${ns#*/}
-    for pod in $(${KUBECTL} get -n ${ns#*/} -o name pod); do
-        ${KUBECTL} -n ${ns#*/} describe pod ${pod#*/} > ${LOG_DIR}/pods/${ns#*/}/${pod#*/}_describe
-        ${KUBECTL} -n ${ns#*/} logs ${pod#*/} > ${LOG_DIR}/pods/${ns#*/}/${pod#*/}
-    done
-done
+gather_kube_logs
 
 # NOTE(mnasiadka): Fail if any pod is not Running
 FAILED_PODS=$(${KUBECTL} get pods -A --field-selector=status.phase!=Running)
