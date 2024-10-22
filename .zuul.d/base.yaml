@@ -55,7 +55,7 @@
 - job:
     name: magnum-tempest-plugin-tests-cluster-base
     parent: magnum-tempest-plugin-base
-    nodeset: magnum-nested-virt-ubuntu-jammy
+    nodeset: magnum-nested-virt-ubuntu-noble
     vars:
       configure_swap_size: 8192
       tox_envlist: all
@@ -86,3 +86,12 @@
         nodes:
           - controller
 
+- nodeset:
+    name: magnum-nested-virt-ubuntu-noble
+    nodes:
+      - name: controller
+        label: nested-virt-ubuntu-noble
+    groups:
+      - name: tempest
+        nodes:
+          - controller
