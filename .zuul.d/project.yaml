@@ -5,6 +5,6 @@
       - check-requirements
       - tempest-plugin-jobs
       - magnum-tempest-plugin-jobs-master
-      - magnum-tempest-plugin-jobs-2023-1
       - magnum-tempest-plugin-jobs-2023-2
       - magnum-tempest-plugin-jobs-2024-1
+      - magnum-tempest-plugin-jobs-2024-2

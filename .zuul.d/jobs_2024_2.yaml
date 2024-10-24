@@ -1,0 +1,57 @@
+---
+- job:
+    name: magnum-tempest-plugin-tests-api-2024-2
+    parent: magnum-tempest-plugin-tests-api-base
+    nodeset: openstack-single-node-jammy
+    override-checkout: stable/2024.2
+    vars:
+      devstack_localrc:
+        MAGNUM_GUEST_IMAGE_URL: https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/38.20230806.3.0/x86_64/fedora-coreos-38.20230806.3.0-openstack.x86_64.qcow2.xz
+      devstack_local_conf:
+        test-config:
+          $TEMPEST_CONFIG:
+            magnum:
+              image_id: fedora-coreos-38.20230806.3.0-openstack.x86_64
+
+- job:
+    name: magnum-tempest-plugin-tests-cluster-2024-2
+    parent: magnum-tempest-plugin-tests-cluster-base
+    nodeset: magnum-nested-virt-ubuntu-jammy
+    override-checkout: stable/2024.2
+    vars:
+      devstack_localrc:
+        MAGNUM_GUEST_IMAGE_URL: https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/38.20230806.3.0/x86_64/fedora-coreos-38.20230806.3.0-openstack.x86_64.qcow2.xz
+      devstack_local_conf:
+        test-config:
+          $TEMPEST_CONFIG:
+            magnum:
+              image_id: fedora-coreos-38.20230806.3.0-openstack.x86_64
+
+- job:
+    name: magnum-tempest-plugin-tests-cluster-2024-2-k8s_fcos_v1-v1.27.8
+    parent: magnum-tempest-plugin-tests-cluster-2024-2
+    vars:
+      devstack_local_conf:
+        test-config:
+          $TEMPEST_CONFIG:
+            magnum:
+              labels:
+                kube_tag: v1.27.8-rancher2
+                container_runtime: containerd
+                containerd_version: 1.6.28
+                containerd_tarball_sha256: f70736e52d61e5ad225f4fd21643b5ca1220013ab8b6c380434caeefb572da9b
+                cloud_provider_tag: v1.27.3
+                cinder_csi_plugin_tag: v1.27.3
+                k8s_keystone_auth_tag: v1.27.3
+                magnum_auto_healer_tag: v1.27.3
+                octavia_ingress_controller_tag: v1.27.3
+                calico_tag: v3.26.4
+
+- project-template:
+    name: magnum-tempest-plugin-jobs-2024-2
+    check:
+      jobs:
+        - magnum-tempest-plugin-tests-api-2024-2
+    gate:
+      jobs:
+        - magnum-tempest-plugin-tests-api-2024-2
