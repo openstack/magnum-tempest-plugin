@@ -202,10 +202,14 @@ def cluster_template_data_with_valid_keypair_image_flavor():
     :returns: ClusterTemplateEntity with generated data
     """
     master_flavor = config.Config.master_flavor_id
-    return cluster_template_data(keypair_id=config.Config.keypair_name,
-                                 image_id=config.Config.image_id,
-                                 flavor_id=config.Config.flavor_id,
-                                 master_flavor_id=master_flavor)
+    return cluster_template_data(
+        keypair_id=config.Config.keypair_name,
+        image_id=config.Config.image_id,
+        flavor_id=config.Config.flavor_id,
+        master_flavor_id=master_flavor,
+        network_driver=config.Config.network_driver,
+        docker_storage_driver=config.Config.docker_storage_driver,
+        labels=config.Config.labels)
 
 
 def cluster_template_data_with_missing_image():
@@ -269,7 +273,8 @@ def valid_cluster_template(is_public=False):
         cluster_distro=None,
         external_network_id=config.Config.nic_id,
         http_proxy=None, https_proxy=None,
-        no_proxy=None, network_driver=config.Config.network_driver,
+        no_proxy=None,
+        network_driver=config.Config.network_driver,
         volume_driver=None,
         docker_storage_driver=config.Config.docker_storage_driver,
         tls_disabled=False,
