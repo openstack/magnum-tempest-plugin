@@ -1,0 +1,4 @@
+---
+upgrade:
+  - |
+    The ``[magnum] csr_location`` option has been removed.

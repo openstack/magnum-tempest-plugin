@@ -58,11 +58,6 @@ MagnumGroup = [
     cfg.StrOpt("master_flavor_id",
                default="ds2G",
                help="Master flavor id to use for ClusterTemplate."),
-    cfg.StrOpt("csr_location",
-               default="/opt/stack/new/magnum/default.csr",
-               deprecated_for_removal=True,
-               help="CSR location for certificates. This option is no "
-               "longer used for anything."),
     cfg.StrOpt("dns_nameserver",
                default="8.8.8.8",
                help="DNS nameserver to use for ClusterTemplate."),

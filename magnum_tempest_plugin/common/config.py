@@ -125,12 +125,6 @@ class Config(object):
         cls.master_flavor_id = CONF.magnum.master_flavor_id
 
     @classmethod
-    def set_csr_location(cls, config):
-        if 'csr_location' not in CONF.magnum:
-            raise Exception('config missing csr_location key')
-        cls.csr_location = CONF.magnum.csr_location
-
-    @classmethod
     def set_dns_nameserver(cls, config):
         if 'dns_nameserver' not in CONF.magnum:
             raise Exception('config missing dns_nameserver')
@@ -177,7 +171,6 @@ class Config(object):
         cls.set_flavor_id(config)
         cls.set_magnum_url(config)
         cls.set_master_flavor_id(config)
-        cls.set_csr_location(config)
         cls.set_dns_nameserver(config)
         cls.set_copy_logs(config)
         cls.set_coe(config)
