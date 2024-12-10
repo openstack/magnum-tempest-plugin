@@ -79,6 +79,6 @@ MagnumGroup = [
                help="Timeout(in minutes) to wait for the cluster creation "
                     "finished."),
     cfg.StrOpt("labels",
-               default={},
+               default='{}',
                help="A dict of labels to be defined in cluster template"),
 ]
