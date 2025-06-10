@@ -11,11 +11,9 @@
 # under the License.
 
 import ast
-import warnings
 
 from tempest import config
 
-from oslo_config import cfg
 
 CONF = config.CONF
 
@@ -28,14 +26,7 @@ class Config(object):
     def set_admin_creds(cls, config):
         cls.admin_user = CONF.auth.admin_username
         cls.admin_passwd = CONF.auth.admin_password
-        # NOTE(toabctl): also allow the old style tempest definition
-        try:
-            cls.admin_tenant = CONF.auth.admin_project_name
-        except cfg.NoSuchOptError:
-            cls.admin_tenant = CONF.auth.admin_tenant_name
-            warnings.warn("the config option 'admin_tenant_name' from the "
-                          "'auth' section is deprecated. Please switch "
-                          "to 'admin_project_name'.")
+        cls.admin_tenant = CONF.auth.admin_project_name
 
     @classmethod
     def set_user_creds(cls, config):
@@ -47,14 +38,7 @@ class Config(object):
         # check Ia5132c5cb32355d6f26b8acdd92a0e55a2c19f41
         cls.user = CONF.auth.admin_username
         cls.passwd = CONF.auth.admin_password
-        # NOTE(toabctl): also allow the old style tempest definition
-        try:
-            cls.tenant = CONF.auth.admin_project_name
-        except cfg.NoSuchOptError:
-            cls.tenant = CONF.auth.admin_tenant_name
-            warnings.warn("the config option 'admin_tenant_name' from the "
-                          "'auth' section is deprecated. Please switch "
-                          "to 'admin_project_name'.")
+        cls.tenant = CONF.auth.admin_project_name
 
     @classmethod
     def set_auth_version(cls, config):
