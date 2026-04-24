@@ -94,8 +94,13 @@ class ClusterTestTemplate(base.BaseTempestTest):
     @classmethod
     def _create_cluster_template(cls, cm_model):
         cls.LOG.debug('We will create a clustertemplate for %s', cm_model)
-        resp, model = cls.ct_member_client.post_cluster_template(
-            cm_model)
+        try:
+            resp, model = cls.ct_member_client.post_cluster_template(
+                cm_model)
+        except Exception as e:
+            cls.LOG.debug("Cluster template create exception: %s\n" % e)
+            cls.LOG.debug("Cluster template fields: %s\n", cm_model.__dict__)
+            raise
         return resp, model
 
     @classmethod
