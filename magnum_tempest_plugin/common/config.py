@@ -136,6 +136,10 @@ class Config(object):
         cls.cluster_creation_timeout = CONF.magnum.cluster_creation_timeout
 
     @classmethod
+    def set_cluster_delete_timeout(cls, config):
+        cls.cluster_delete_timeout = CONF.magnum.cluster_delete_timeout
+
+    @classmethod
     def set_labels(cls, config):
         cls.labels = ast.literal_eval(CONF.magnum.labels)
 
@@ -161,4 +165,5 @@ class Config(object):
         cls.set_network_driver(config)
         cls.set_cluster_template_id(config)
         cls.set_cluster_creation_timeout(config)
+        cls.set_cluster_delete_timeout(config)
         cls.set_labels(config)

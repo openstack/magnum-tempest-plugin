@@ -79,6 +79,10 @@ MagnumGroup = [
                default=30,
                help="Timeout(in minutes) to wait for the cluster creation "
                     "finished."),
+    cfg.IntOpt("cluster_delete_timeout",
+               default=15,
+               help="Timeout(in minutes) to wait for the cluster deletion "
+                    "finished."),
     cfg.StrOpt("labels",
                default='{}',
                help="A dict of labels to be defined in cluster template"),
