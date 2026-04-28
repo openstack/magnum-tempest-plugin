@@ -17,6 +17,7 @@ from kubernetes.client.rest import ApiException
 from oslo_log import log as logging
 from oslo_serialization import base64
 from oslo_utils import uuidutils
+from pathlib import Path
 from tempest.lib.common.utils import data_utils
 from tempest.lib import decorators
 from tempest.lib import exceptions
@@ -243,6 +244,7 @@ users:
         with kubernetes.client.ApiClient(kube_config) as api_client:
             v1 = kubernetes.client.CoreV1Api(api_client)
             try:
+                Path("/tmp/magnum-nodes").mkdir(parents=True, exist_ok=True)
                 list_nodes = v1.list_node(pretty="true")
                 with open("/tmp/magnum-nodes/api-list-nodes", "w") as outfile:
                     outfile.write(str(list_nodes))
