@@ -7,8 +7,10 @@
     required-projects:
       - openstack/barbican
       - openstack/heat
+      - openstack/manila
       - openstack/magnum
       - openstack/magnum-tempest-plugin
+      - openstack/octavia
       - openstack/python-magnumclient
     vars:
       tempest_plugins:
@@ -19,6 +21,8 @@
         heat: https://opendev.org/openstack/heat
         barbican: https://opendev.org/openstack/barbican
         magnum: https://opendev.org/openstack/magnum
+        manila: https://opendev.org/openstack/manila
+        octavia: https://opendev.org/openstack/octavia
       devstack_services:
         # Disable swift and dependent c-bak service to support upload of .qcow2.xz image in the gate
         s-account: false
@@ -38,6 +42,9 @@
 - job:
     name: magnum-tempest-plugin-tests-api-base
     parent: magnum-tempest-plugin-base
+    required-projects:
+      - name: github.com/vexxhost/magnum-cluster-api
+        override-checkout: main
     vars:
       tox_envlist: all
       tempest_test_regex: ^magnum_tempest_plugin.tests.api
