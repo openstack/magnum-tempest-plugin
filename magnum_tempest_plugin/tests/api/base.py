@@ -20,9 +20,6 @@ from magnum_tempest_plugin.common import config
 from magnum_tempest_plugin.common import manager
 
 
-COPY_LOG_HELPER = "magnum/tests/contrib/copy_instance_logs.sh"
-
-
 class BaseTempestTest(base.BaseMagnumTest):
     """Sets up configuration required for functional tests"""
 

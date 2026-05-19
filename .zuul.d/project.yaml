@@ -3,7 +3,8 @@
     queue: magnum
     templates:
       - check-requirements
-      - tempest-plugin-jobs
+      - magnum-capi-helm-tests-cluster-v1_34
       - magnum-tempest-plugin-jobs-master
       - magnum-tempest-plugin-jobs-2025-2
       - magnum-tempest-plugin-jobs-2025-1
+      - tempest-plugin-jobs

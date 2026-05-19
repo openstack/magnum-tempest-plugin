@@ -6,7 +6,6 @@
     parent: devstack-tempest
     required-projects:
       - openstack/barbican
-      - openstack/heat
       - openstack/manila
       - openstack/magnum
       - openstack/magnum-tempest-plugin
@@ -18,7 +17,6 @@
       devstack_localrc:
         GLANCE_LIMIT_IMAGE_SIZE_TOTAL: 5000
       devstack_plugins:
-        heat: https://opendev.org/openstack/heat
         barbican: https://opendev.org/openstack/barbican
         magnum: https://opendev.org/openstack/magnum
         manila: https://opendev.org/openstack/manila

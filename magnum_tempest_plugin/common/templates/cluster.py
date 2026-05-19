@@ -127,22 +127,7 @@ class ClusterTestTemplate(base.BaseTempestTest):
                 model.uuid, delete_on_error=False, timeout=timeout)
         except Exception as e:
             self.LOG.debug("Cluster create exception: %s\n" % e)
-            self.copy_logs_handler(
-                lambda: list(
-                    [self._get_cluster_by_id(model.uuid)[1].master_addresses,
-                     self._get_cluster_by_id(model.uuid)[1].node_addresses]),
-                self.cluster_template.coe,
-                self.keypair)
             raise
-
-        if config.Config.copy_logs_success:
-            self.LOG.debug('Copying logs on success')
-            self.copy_logs_handler(
-                lambda: list(
-                    [self._get_cluster_by_id(model.uuid)[1].master_addresses,
-                     self._get_cluster_by_id(model.uuid)[1].node_addresses]),
-                self.cluster_template.coe,
-                self.keypair)
 
         return resp, model
 
