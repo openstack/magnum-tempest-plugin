@@ -24,7 +24,18 @@ function gather_kube_logs {
         mkdir -p ${LOG_DIR}/pods/${ns#*/}
         for pod in $(${KUBECTL} get -n ${ns#*/} -o name pod); do
             ${KUBECTL} -n ${ns#*/} describe pod ${pod#*/} > ${LOG_DIR}/pods/${ns#*/}/${pod#*/}_describe
-            ${KUBECTL} -n ${ns#*/} logs ${pod#*/} > ${LOG_DIR}/pods/${ns#*/}/${pod#*/}
+            for container in $(${KUBECTL} -n ${ns#*/} get pod ${pod#*/} -o jsonpath='{.spec.containers[*].name}'); do
+                ${KUBECTL} -n ${ns#*/} logs ${pod#*/} -c ${container} \
+                    > ${LOG_DIR}/pods/${ns#*/}/${pod#*/}_${container}
+                ${KUBECTL} -n ${ns#*/} logs ${pod#*/} -c ${container} --previous \
+                    > ${LOG_DIR}/pods/${ns#*/}/${pod#*/}_${container}_previous 2>/dev/null || true
+            done
+            for container in $(${KUBECTL} -n ${ns#*/} get pod ${pod#*/} -o jsonpath='{.spec.initContainers[*].name}'); do
+                ${KUBECTL} -n ${ns#*/} logs ${pod#*/} -c ${container} \
+                    > ${LOG_DIR}/pods/${ns#*/}/${pod#*/}_init_${container}
+                ${KUBECTL} -n ${ns#*/} logs ${pod#*/} -c ${container} --previous \
+                    > ${LOG_DIR}/pods/${ns#*/}/${pod#*/}_init_${container}_previous 2>/dev/null || true
+            done
         done
     done
 }
