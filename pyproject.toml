@@ -31,4 +31,4 @@ Repository = "https://opendev.org/openstack/magnum-tempest-plugin"
 magnum_tests = "magnum_tempest_plugin.plugin:MagnumTempestPlugin"
 
 [tool.setuptools.packages.find]
-include = ["magnum_tempest_plugin"]
+include = ["magnum_tempest_plugin*"]
