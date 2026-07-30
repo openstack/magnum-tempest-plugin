@@ -22,6 +22,7 @@ from tempest.lib.common.utils import data_utils
 from tempest.lib import decorators
 from tempest.lib import exceptions
 import testtools
+import time
 from yaml import safe_load
 
 from magnum_tempest_plugin.common import config
@@ -135,8 +136,9 @@ class ClusterTestTemplate(base.BaseTempestTest):
         self.LOG.debug('We will delete a cluster for %s', cluster_id)
         resp, model = self.cluster_member_client.delete_cluster(cluster_id)
         self.assertEqual(204, resp.status)
-
-        self.cluster_admin_client.wait_for_cluster_to_delete(cluster_id)
+        timeout = config.Config.cluster_delete_timeout * 60
+        self.cluster_admin_client.wait_for_cluster_to_delete(
+            cluster_id, timeout=timeout)
 
         self.assertRaises(exceptions.NotFound,
                           self.cert_reader_client.get_cert,
@@ -250,6 +252,7 @@ users:
             raise
 
         # test cluster delete
+        time.sleep(300)
         self._delete_cluster(cluster_model.uuid)
         self.clusters.remove(cluster_model.uuid)
 

@@ -111,9 +111,9 @@ class ClusterClient(client.MagnumClient):
 
         return self.delete(self.cluster_uri(cluster_id), **kwargs)
 
-    def wait_for_cluster_to_delete(self, cluster_id):
+    def wait_for_cluster_to_delete(self, cluster_id, timeout=300):
         utils.wait_for_condition(
-            lambda: self.does_cluster_not_exist(cluster_id), 10, 300)
+            lambda: self.does_cluster_not_exist(cluster_id), 10, timeout)
 
     def wait_for_created_cluster(self, cluster_id, delete_on_error=True,
                                  timeout=3600):
