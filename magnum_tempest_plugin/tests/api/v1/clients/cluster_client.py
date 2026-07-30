@@ -164,6 +164,18 @@ class ClusterClient(client.MagnumClient):
         except exceptions.NotFound:
             self.LOG.warning('Cluster %s is not found.', cluster_id)
             return False
+        except exceptions.BadRequest:
+            # A cluster can briefly exist in the DB with no nodegroups yet
+            # right after creation starts, before the conductor has
+            # persisted its master/worker nodegroups. Magnum's derived
+            # master_count/node_count fields are computed from those
+            # nodegroups, so a GET landing in that window can fail
+            # response validation with a spurious 400. Treat it the same
+            # as "not ready yet" rather than a hard failure.
+            self.LOG.warning('Cluster %s returned a bad state. Assuming '
+                             'temporary failure and the cluster is not '
+                             'ready yet.', cluster_id)
+            return False
 
     def does_cluster_not_exist(self, cluster_id):
         try:
