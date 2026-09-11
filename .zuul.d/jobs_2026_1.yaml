@@ -1,0 +1,23 @@
+---
+- job:
+    name: magnum-tempest-plugin-tests-api-2026-1
+    parent: magnum-tempest-plugin-tests-api-base
+    nodeset: openstack-single-node-noble
+    override-checkout: stable/2026.1
+    vars:
+      devstack_localrc:
+        MAGNUM_GUEST_IMAGE_URL: https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/38.20230806.3.0/x86_64/fedora-coreos-38.20230806.3.0-openstack.x86_64.qcow2.xz
+      devstack_local_conf:
+        test-config:
+          $TEMPEST_CONFIG:
+            magnum:
+              image_id: fedora-coreos-38.20230806.3.0-openstack.x86_64
+
+- project-template:
+    name: magnum-tempest-plugin-jobs-2026-1
+    check:
+      jobs:
+        - magnum-tempest-plugin-tests-api-2026-1
+    gate:
+      jobs:
+        - magnum-tempest-plugin-tests-api-2026-1
