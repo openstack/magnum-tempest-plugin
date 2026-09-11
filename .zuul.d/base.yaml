@@ -57,6 +57,7 @@
               master_flavor_id: ds2G
               copy_logs: true
 
+# TODO(tkajinam): Remove this once stable/2025.1 is retired.
 - job:
     name: magnum-tempest-plugin-tests-cluster-base
     parent: magnum-tempest-plugin-base
@@ -80,16 +81,6 @@
               copy_logs_sucess: true
       zuul_copy_output:
         /tmp/magnum-nodes: logs
-
-- nodeset:
-    name: magnum-nested-virt-ubuntu-jammy
-    nodes:
-      - name: controller
-        label: nested-virt-ubuntu-jammy
-    groups:
-      - name: tempest
-        nodes:
-          - controller
 
 - nodeset:
     name: magnum-nested-virt-ubuntu-noble
